@@ -1,7 +1,10 @@
-import express from 'express';
-const app = express()
+import express from "express";
+const app = express();
 import Lab5 from "./Lab5/index.js";
-import Hello from "./Hello.js"
+import Hello from "./Hello.js";
+import cors from "cors";
+app.use(cors());
 Lab5(app);
-Hello(app)
-app.listen(process.env.PORT || 4000)
+app.use(express.json());
+Hello(app);
+app.listen(process.env.PORT || 4000);
