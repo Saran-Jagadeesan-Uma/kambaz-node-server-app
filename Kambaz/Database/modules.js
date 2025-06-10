@@ -1,4 +1,4 @@
-export default [
+export default 
 [
   {
     "_id": "M101",
@@ -234,5 +234,4 @@ export default [
       }
     ]
   }
-]
 ];
