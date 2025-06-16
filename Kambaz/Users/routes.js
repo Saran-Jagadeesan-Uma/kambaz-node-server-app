@@ -7,7 +7,6 @@ export default function UserRoutes(app) {
     const user = await dao.createUser(req.body);
     res.json(user);
   };
-  app.post("/api/users", createUser);
 
   const deleteUser = async (req, res) => {
     const status = await dao.deleteUser(req.params.userId);
@@ -26,7 +25,6 @@ export default function UserRoutes(app) {
       res.json(users);
       return;
     }
-
     const users = await dao.findAllUsers();
     res.json(users);
   };
@@ -50,7 +48,6 @@ export default function UserRoutes(app) {
     }
     res.json(currentUser);
   };
-  app.put("/api/users/:userId", updateUser);
 
   const signup = async (req, res) => {
     const existingUser = await dao.findUserByUsername(req.body.username);
@@ -88,17 +85,25 @@ export default function UserRoutes(app) {
     res.json(currentUserInSession);
   };
 
-  const findCoursesForEnrolledUser = async (req, res) => {
-    let { userId } = req.params;
-    if (userId === "current") {
-      const currentUserInSession = req.session["currentUser"];
-      if (!currentUserInSession) {
-        res.sendStatus(401);
-        return;
-      }
-      userId = currentUserInSession._id;
+  const findCoursesForUser = async (req, res) => {
+    const currentUser = req.session["currentUser"];
+    if (!currentUser) {
+      res.sendStatus(401);
+      return;
     }
-    const courses = await courseDao.findCoursesForEnrolledUser(userId);
+
+    if (currentUser.role === "ADMIN") {
+      const courses = await courseDao.findAllCourses();
+      res.json(courses);
+      return;
+    }
+
+    let { uid } = req.params;
+    if (uid === "current") {
+      uid = currentUser._id;
+    }
+
+    const courses = await enrollmentsDao.findCoursesForUser(uid);
     res.json(courses);
   };
 
@@ -108,21 +113,25 @@ export default function UserRoutes(app) {
       res.status(401).json({ message: "Not authenticated" });
       return;
     }
+
     const newCourse = await courseDao.createCourse(req.body);
     await enrollmentsDao.enrollUserInCourse(currentUser._id, newCourse._id);
     res.json(newCourse);
   };
 
-  // ROUTES
+  // Route registrations
   app.post("/api/users", createUser);
   app.get("/api/users", findAllUsers);
   app.get("/api/users/:userId", findUserById);
   app.put("/api/users/:userId", updateUser);
   app.delete("/api/users/:userId", deleteUser);
+
   app.post("/api/users/signup", signup);
   app.post("/api/users/signin", signin);
   app.post("/api/users/signout", signout);
   app.post("/api/users/profile", profile);
-  app.get("/api/users/:userId/courses", findCoursesForEnrolledUser);
+
+  app.get("/api/users/:uid/courses", findCoursesForUser);
   app.post("/api/users/current/courses", createCourse);
+
 }

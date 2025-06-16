@@ -1,43 +1,31 @@
-import Database from "../Database/index.js";
-import { v4 as uuidv4 } from "uuid";
+import model from "./model.js";
 
-export const getUserEnrollments = async (userId) => {
-  const { enrollments, courses } = Database;
+export async function findCoursesForUser(userId) {
+  const enrollments = await model.find({ user: userId }).populate("course");
+  return enrollments.map((enrollment) => enrollment.course);
+}
 
-  const userEnrollments = enrollments
-    .filter((enrollment) => enrollment.user === userId)
-    .map((enrollment) => {
-      const course = courses.find((c) => c._id === enrollment.course);
-      return course;
-    });
+export async function findUsersForCourse(courseId) {
+  const enrollments = await model.find({ course: courseId }).populate("user");
+  return enrollments.map((enrollment) => enrollment.user);
+}
 
-  return userEnrollments;
-};
-
-export const toggleUserInCourse = async (userId, courseId) => {
-  const { enrollments } = Database;
-  const existing = enrollments.find(
-    (enrollment) => enrollment.user === userId && enrollment.course === courseId
-  );
+export function enrollUserInCourse(user, course) {
+  const newEnrollment = { user, course, _id: `${user}-${course}` };
+  return model.create(newEnrollment);
+}
+export function unenrollUserFromCourse(user, course) {
+  return model.deleteOne({ user, course });
+}
+export async function toggleUserInCourse(user, course) {
+  const existing = await model.findOne({ user, course });
 
   if (existing) {
-    Database.enrollments = enrollments.filter(
-      (enrollment) =>
-        !(enrollment.user === userId && enrollment.course === courseId)
-    );
+    await model.deleteOne({ user, course });
   } else {
-    enrollments.push({ _id: uuidv4(), user: userId, course: courseId });
+    await model.create({ user, course, _id: `${user}-${course}` });
   }
 
-  return getUserEnrollments(userId);
-};
-
-export const enrollUserInCourse = (userId, courseId) => {
-  const newEnrollment = {
-    _id: uuidv4(),
-    user: userId,
-    course: courseId,
-  };
-  Database.enrollments.push(newEnrollment);
-  return newEnrollment;
-};
+  const enrollments = await model.find({ user }).populate("course");
+  return enrollments.map((enrollment) => enrollment.course);
+}
