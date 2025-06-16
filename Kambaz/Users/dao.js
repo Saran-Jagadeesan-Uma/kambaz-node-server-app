@@ -1,28 +1,42 @@
-import model from "./model.js";
+import db from "../Database/index.js";
+import { v4 as uuidv4 } from "uuid";
 
 export const createUser = (user) => {
   const newUser = { ...user, _id: uuidv4() };
-  return model.create(newUser);
+  db.users.push(newUser);
+  return newUser;
 };
 
-export const findAllUsers = () => model.find();
+export const findAllUsers = () => db.users;
 
-export const findUserById = (userId) => model.findById(userId);
+export const findUserById = (userId) =>
+  db.users.find((user) => user._id === userId);
 
-export const findUserByUsername = (username) => model.findOne({ username });
+export const findUserByUsername = (username) =>
+  db.users.find((user) => user.username === username);
 
-export const findUserByCredentials = (username, password) =>
-  model.findOne({ username, password });
+export const findUserByCredentials = (username, password) => {
+  const foundUser = db.users.find(
+    (user) => user.username === username && user.password === password
+  );
 
-export const updateUser = (userId, user) =>
-  model.updateOne({ _id: userId }, { $set: user });
+  if (foundUser) {
+    console.log("DAO: User found by credentials:", foundUser.username);
+  } else {
+    console.log("DAO: User NOT found for the provided credentials.");
+  }
+  return foundUser;
+};
 
-export const deleteUser = (userId) => model.deleteOne({ _id: userId });
+export const updateUser = (userId, user) => {
+  const userIndex = db.users.findIndex((u) => u._id === userId);
+  if (userIndex !== -1) {
+    db.users[userIndex] = { ...db.users[userIndex], ...user };
+    return db.users[userIndex];
+  }
+  return null;
+};
 
-export const findUsersByRole = (role) => model.find({ role: role });
-export const findUsersByPartialName = (partialName) => {
-  const regex = new RegExp(partialName, "i");
-  return model.find({
-    $or: [{ firstName: { $regex: regex } }, { lastName: { $regex: regex } }],
-  });
+export const deleteUser = (userId) => {
+  db.users = db.users.filter((u) => u._id !== userId);
 };

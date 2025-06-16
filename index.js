@@ -9,11 +9,7 @@ import AssignmentRoutes from "./Kambaz/Assignments/routes.js";
 import session from "express-session";
 import EnrollmentsRoutes from "./Kambaz/Enrollments/routes.js";
 import "dotenv/config";
-import mongoose from "mongoose";
 
-const CONNECTION_STRING =
-  process.env.MONGO_CONNECTION_STRING || "mongodb://127.0.0.1:27017/kambaz";
-mongoose.connect(CONNECTION_STRING);
 const app = express();
 
 const sessionOptions = {
@@ -41,7 +37,7 @@ app.use(session(sessionOptions));
 app.use(express.json());
 
 UserRoutes(app);
-CourseRoutes(app);
+CourseRoutes(app); 
 Lab5(app);
 Hello(app);
 ModuleRoutes(app);

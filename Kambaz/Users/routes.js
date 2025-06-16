@@ -1,71 +1,36 @@
 import * as dao from "./dao.js";
 import * as courseDao from "../Courses/dao.js";
-import * as enrollmentsDao from "../Enrollments/dao.js";
+import * as enrollmentsDao from "../Enrollments/dao.js"; // Added import
 
 export default function UserRoutes(app) {
-  const createUser = async (req, res) => {
-    const user = await dao.createUser(req.body);
-    res.json(user);
-  };
-  app.post("/api/users", createUser);
+  const createUser = (req, res) => {};
+  const deleteUser = (req, res) => {};
+  const findAllUsers = (req, res) => {};
+  const findUserById = (req, res) => {};
 
-  const deleteUser = async (req, res) => {
-    const status = await dao.deleteUser(req.params.userId);
-    res.json(status);
-  };
-
-  const findAllUsers = async (req, res) => {
-    const { role, name } = req.query;
-    if (role) {
-      const users = await dao.findUsersByRole(role);
-      res.json(users);
-      return;
-    }
-    if (name) {
-      const users = await dao.findUsersByPartialName(name);
-      res.json(users);
-      return;
-    }
-
-    const users = await dao.findAllUsers();
-    res.json(users);
-  };
-
-  const findUserById = async (req, res) => {
-    const user = await dao.findUserById(req.params.userId);
-    if (user) {
-      res.json(user);
-    } else {
-      res.sendStatus(404);
-    }
-  };
-
-  const updateUser = async (req, res) => {
-    const { userId } = req.params;
+  const updateUser = (req, res) => {
+    const userId = req.params.userId;
     const userUpdates = req.body;
-    await dao.updateUser(userId, userUpdates);
-    const currentUser = req.session["currentUser"];
-    if (currentUser && currentUser._id === userId) {
-      req.session["currentUser"] = { ...currentUser, ...userUpdates };
-    }
-    res.json(currentUser);
+    dao.updateUser(userId, userUpdates);
+    const updatedUser = dao.findUserById(userId);
+    req.session["currentUser"] = updatedUser;
+    res.json(updatedUser);
   };
-  app.put("/api/users/:userId", updateUser);
 
-  const signup = async (req, res) => {
-    const existingUser = await dao.findUserByUsername(req.body.username);
-    if (existingUser) {
+  const signup = (req, res) => {
+    const user = dao.findUserByUsername(req.body.username);
+    if (user) {
       res.status(400).json({ message: "Username already taken" });
       return;
     }
-    const newUser = await dao.createUser(req.body);
+    const newUser = dao.createUser(req.body);
     req.session["currentUser"] = newUser;
     res.json(newUser);
   };
 
-  const signin = async (req, res) => {
+  const signin = (req, res) => {
     const { username, password } = req.body;
-    const foundUser = await dao.findUserByCredentials(username, password);
+    const foundUser = dao.findUserByCredentials(username, password);
     if (foundUser) {
       req.session["currentUser"] = foundUser;
       res.json(foundUser);
@@ -88,7 +53,7 @@ export default function UserRoutes(app) {
     res.json(currentUserInSession);
   };
 
-  const findCoursesForEnrolledUser = async (req, res) => {
+  const findCoursesForEnrolledUser = (req, res) => {
     let { userId } = req.params;
     if (userId === "current") {
       const currentUserInSession = req.session["currentUser"];
@@ -98,22 +63,21 @@ export default function UserRoutes(app) {
       }
       userId = currentUserInSession._id;
     }
-    const courses = await courseDao.findCoursesForEnrolledUser(userId);
+    const courses = courseDao.findCoursesForEnrolledUser(userId);
     res.json(courses);
   };
 
-  const createCourse = async (req, res) => {
+  const createCourse = (req, res) => {
     const currentUser = req.session["currentUser"];
     if (!currentUser) {
       res.status(401).json({ message: "Not authenticated" });
       return;
     }
-    const newCourse = await courseDao.createCourse(req.body);
-    await enrollmentsDao.enrollUserInCourse(currentUser._id, newCourse._id);
+    const newCourse = courseDao.createCourse(req.body);
+    enrollmentsDao.enrollUserInCourse(currentUser._id, newCourse._id);
     res.json(newCourse);
   };
 
-  // ROUTES
   app.post("/api/users", createUser);
   app.get("/api/users", findAllUsers);
   app.get("/api/users/:userId", findUserById);
