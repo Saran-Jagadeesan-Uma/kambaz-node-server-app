@@ -9,21 +9,21 @@ export default function ModuleRoutes(app) {
       const updated = await modulesDao.updateModule(moduleId, moduleUpdates);
       res.json(updated);
     } catch (e) {
-      console.error("Update failed:", e.message);
       res.status(500).send(`Update failed: ${e.message}`);
     }
   });
 
   app.delete("/api/modules/:moduleId", async (req, res) => {
     const { moduleId } = req.params;
+
     try {
       await modulesDao.deleteModule(moduleId);
       res.sendStatus(204);
     } catch (err) {
-      console.error("Error deleting module:", err);
       res.status(500).send("Error deleting module");
     }
   });
+
   app.post("/api/courses/:courseId/modules", async (req, res) => {
     const { courseId } = req.params;
     const moduleData = req.body;
@@ -35,7 +35,6 @@ export default function ModuleRoutes(app) {
       });
       res.json(newModule);
     } catch (err) {
-      console.error("Error creating module:", err);
       res.status(500).send("Error creating module");
     }
   });
