@@ -7,6 +7,11 @@ export default function CourseRoutes(app) {
     res.json(courses);
   });
 
+  app.post("/api/courses", async (req, res) => {
+    const newCourse = await dao.createCourse(req.body);
+    res.json(newCourse);
+  });
+
   app.get("/api/courses/:courseId/modules", async (req, res) => {
     const { courseId } = req.params;
     const modules = await modulesDao.findModulesForCourse(courseId);
