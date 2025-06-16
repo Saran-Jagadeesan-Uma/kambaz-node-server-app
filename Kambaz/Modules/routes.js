@@ -1,12 +1,12 @@
 import * as modulesDao from "./dao.js";
 
 export default function ModuleRoutes(app) {
-  app.put("/api/modules/:moduleId", (req, res) => {
+  app.put("/api/modules/:moduleId", async (req, res) => {
     const { moduleId } = req.params;
     const moduleUpdates = req.body;
 
     try {
-      const updated = modulesDao.updateModule(moduleId, moduleUpdates);
+      const updated = await modulesDao.updateModule(moduleId, moduleUpdates);
       res.json(updated);
     } catch (e) {
       console.error("Update failed:", e.message);
@@ -22,6 +22,21 @@ export default function ModuleRoutes(app) {
     } catch (err) {
       console.error("Error deleting module:", err);
       res.status(500).send("Error deleting module");
+    }
+  });
+  app.post("/api/courses/:courseId/modules", async (req, res) => {
+    const { courseId } = req.params;
+    const moduleData = req.body;
+
+    try {
+      const newModule = await modulesDao.createModule({
+        ...moduleData,
+        course: courseId,
+      });
+      res.json(newModule);
+    } catch (err) {
+      console.error("Error creating module:", err);
+      res.status(500).send("Error creating module");
     }
   });
 }

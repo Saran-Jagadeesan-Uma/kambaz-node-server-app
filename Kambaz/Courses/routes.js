@@ -58,7 +58,7 @@ export default function CourseRoutes(app) {
       const status = await dao.updateCourse(courseId, courseUpdates);
       res.send(status);
     } catch (error) {
-      res.status(500).send(error.message);
+      res.status(500).send(error.message);  
     }
   });
 }
