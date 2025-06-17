@@ -3,7 +3,7 @@ import * as enrollmentsDao from "./dao.js";
 export default function EnrollmentsRoutes(app) {
   app.get("/api/enrollments", async (req, res) => {
     try {
-      const enrollments = await enrollmentsDao.findAllEnrollments(); // Make sure this exists
+      const enrollments = await enrollmentsDao.findAllEnrollments();
       res.send(enrollments);
     } catch (err) {
       console.error("Error fetching all enrollments:", err);

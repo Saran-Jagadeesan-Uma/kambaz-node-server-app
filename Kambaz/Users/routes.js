@@ -119,7 +119,6 @@ export default function UserRoutes(app) {
     res.json(newCourse);
   };
 
-  // Route registrations
   app.post("/api/users", createUser);
   app.get("/api/users", findAllUsers);
   app.get("/api/users/:userId", findUserById);
@@ -133,5 +132,4 @@ export default function UserRoutes(app) {
 
   app.get("/api/users/:uid/courses", findCoursesForUser);
   app.post("/api/users/current/courses", createCourse);
-
 }
