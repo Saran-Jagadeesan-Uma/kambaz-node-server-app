@@ -10,9 +10,11 @@ import session from "express-session";
 import EnrollmentsRoutes from "./Kambaz/Enrollments/routes.js";
 import "dotenv/config";
 import mongoose from "mongoose";
+import QuizRoutes from "./Kambaz/Quizzes/routes.js";
 
 const CONNECTION_STRING =
-process.env.MONGO_CONNECTION_STRING || "mongodb://127.0.0.1:27017/kambaz_project_db";
+  process.env.MONGO_CONNECTION_STRING ||
+  "mongodb://127.0.0.1:27017/kambaz_project_db";
 mongoose.connect(CONNECTION_STRING);
 const app = express();
 
@@ -47,5 +49,7 @@ Hello(app);
 ModuleRoutes(app);
 AssignmentRoutes(app);
 EnrollmentsRoutes(app);
+QuizRoutes(app);
+
 const port = process.env.PORT || 4000;
 app.listen(port);
