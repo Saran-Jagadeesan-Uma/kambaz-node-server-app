@@ -11,7 +11,7 @@ const questionSchema = new mongoose.Schema(
     },
     text: String,
     points: { type: Number, default: 0 },
-    choices: [String], 
+    choices: [String],
     correctAnswer: mongoose.Schema.Types.Mixed,
   },
   { collection: "questions" }

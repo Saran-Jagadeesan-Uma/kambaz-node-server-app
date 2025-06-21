@@ -4,7 +4,7 @@ const quizSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, default: "New Quiz" },
     description: String,
-    course: { type: String, ref: "Course", required: true }, 
+    course: { type: String, ref: "Course", required: true },
     published: { type: Boolean, default: false },
     availableFrom: Date,
     availableUntil: Date,
