@@ -13,7 +13,6 @@ export const createQuestion = async (req, res) => {
       quiz: quizId,
     });
 
-    // ✅ Add question to quiz's questions array
     const updatedQuiz = await QuizModel.findByIdAndUpdate(
       quizId,
       { $push: { questions: newQuestion._id } },
