@@ -56,9 +56,20 @@ export const updateQuestion = async (req, res) => {
 export const deleteQuestion = async (req, res) => {
   const { questionId } = req.params;
   try {
+    // Find the question first
+    const question = await QuestionModel.findById(questionId);
+    if (!question) return res.status(404).send("Question not found");
+
+    // Remove the question from the associated quiz's questions array
+    await QuizModel.findByIdAndUpdate(question.quiz, {
+      $pull: { questions: questionId },
+    });
+
+    // Delete the question
     await QuestionModel.findByIdAndDelete(questionId);
     res.sendStatus(204);
   } catch (err) {
+    console.error("Error deleting question:", err);
     res.status(500).send("Error deleting question");
   }
 };
