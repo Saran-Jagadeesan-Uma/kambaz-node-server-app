@@ -1,4 +1,5 @@
 import quizModel from "./model.js";
+import questionModel from "../Questions/model.js"; // ✅ Needed for deleting questions
 
 export const createQuiz = async (courseId, quiz) => {
   console.log("📥 Creating quiz for course:", courseId);
@@ -13,7 +14,7 @@ export const findQuizzesForCourse = async (courseId) => {
 };
 
 export const findQuizById = async (quizId) => {
-  const quiz = await quizModel.findById(quizId).populate("questions"); // ✅ FIXED
+  const quiz = await quizModel.findById(quizId).populate("questions"); // ✅ Returns full questions
   return quiz;
 };
 
@@ -22,5 +23,14 @@ export const updateQuiz = async (quizId, quiz) => {
 };
 
 export const deleteQuiz = async (quizId) => {
-  return await quizModel.deleteOne({ _id: quizId });
+  try {
+    // ✅ Delete all questions linked to this quiz
+    await questionModel.deleteMany({ quiz: quizId });
+
+    // ✅ Then delete the quiz
+    return await quizModel.deleteOne({ _id: quizId });
+  } catch (err) {
+    console.error("❌ Error deleting quiz and its questions:", err);
+    throw err;
+  }
 };
