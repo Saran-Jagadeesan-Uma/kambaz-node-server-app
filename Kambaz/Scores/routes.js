@@ -2,7 +2,6 @@ import * as dao from "./dao.js";
 import { findQuizById } from "../Quizzes/dao.js";
 
 export default function AttemptRoutes(app) {
-  // POST: Submit a new attempt
   app.post("/api/quizzes/:quizId/attempts", async (req, res) => {
     const { quizId } = req.params;
     const { student } = req.body;
@@ -40,7 +39,6 @@ export default function AttemptRoutes(app) {
     }
   });
 
-  // GET: Fetch last attempt for a student on a quiz
   app.get("/api/quizzes/:quizId/attempts/:studentId", async (req, res) => {
     const { studentId, quizId } = req.params;
 
@@ -65,7 +63,6 @@ export default function AttemptRoutes(app) {
     }
   });
 
-  // GET: Count attempts for a student on a quiz
   app.get(
     "/api/quizzes/:quizId/attempts/:studentId/count",
     async (req, res) => {

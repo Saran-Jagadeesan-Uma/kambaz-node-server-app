@@ -6,7 +6,7 @@ const attemptSchema = new mongoose.Schema(
     answers: [
       {
         question: { type: mongoose.Schema.Types.ObjectId, ref: "Question" },
-        selected: mongoose.Schema.Types.Mixed, // string, boolean, or string[] for FITB
+        selected: mongoose.Schema.Types.Mixed,
         correct: Boolean,
       },
     ],
