@@ -13,9 +13,13 @@ export const createQuestion = async (req, res) => {
       quiz: quizId,
     });
 
-    await QuizModel.findByIdAndUpdate(quizId, {
-      $push: { questions: newQuestion._id },
-    });
+    // ✅ Add question to quiz's questions array
+    const updatedQuiz = await QuizModel.findByIdAndUpdate(
+      quizId,
+      { $push: { questions: newQuestion._id } },
+      { new: true }
+    );
+    console.log("🔗 Linked question to quiz:", updatedQuiz);
 
     res.json(newQuestion);
   } catch (err) {
@@ -52,9 +56,20 @@ export const updateQuestion = async (req, res) => {
 export const deleteQuestion = async (req, res) => {
   const { questionId } = req.params;
   try {
+    // Find the question first
+    const question = await QuestionModel.findById(questionId);
+    if (!question) return res.status(404).send("Question not found");
+
+    // Remove the question from the associated quiz's questions array
+    await QuizModel.findByIdAndUpdate(question.quiz, {
+      $pull: { questions: questionId },
+    });
+
+    // Delete the question
     await QuestionModel.findByIdAndDelete(questionId);
     res.sendStatus(204);
   } catch (err) {
+    console.error("Error deleting question:", err);
     res.status(500).send("Error deleting question");
   }
 };
