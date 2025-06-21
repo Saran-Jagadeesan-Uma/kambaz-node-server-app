@@ -5,20 +5,21 @@ export const createQuestion = async (req, res) => {
   const { quizId } = req.params;
 
   try {
-    // Remove quiz field from body if present
     const questionData = { ...req.body };
     delete questionData.quiz;
 
-    // Create question with quizId from params
     const newQuestion = await QuestionModel.create({
       ...questionData,
       quiz: quizId,
     });
 
-    // Link question ID to the quiz document
-    await QuizModel.findByIdAndUpdate(quizId, {
-      $push: { questions: newQuestion._id },
-    });
+    // ✅ Add question to quiz's questions array
+    const updatedQuiz = await QuizModel.findByIdAndUpdate(
+      quizId,
+      { $push: { questions: newQuestion._id } },
+      { new: true }
+    );
+    console.log("🔗 Linked question to quiz:", updatedQuiz);
 
     res.json(newQuestion);
   } catch (err) {
