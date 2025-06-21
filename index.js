@@ -52,7 +52,7 @@ ModuleRoutes(app);
 AssignmentRoutes(app);
 EnrollmentsRoutes(app);
 QuizRoutes(app);
-QuestionsRoutes(app)
+QuestionsRoutes(app);
 AttemptRoutes(app);
 const port = process.env.PORT || 4000;
 app.listen(port);

@@ -1,5 +1,5 @@
 import quizModel from "./model.js";
-import questionModel from "../Questions/model.js"; // ✅ Needed for deleting questions
+import questionModel from "../Questions/model.js"; 
 
 export const createQuiz = async (courseId, quiz) => {
   console.log("📥 Creating quiz for course:", courseId);
@@ -14,7 +14,7 @@ export const findQuizzesForCourse = async (courseId) => {
 };
 
 export const findQuizById = async (quizId) => {
-  const quiz = await quizModel.findById(quizId).populate("questions"); // ✅ Returns full questions
+  const quiz = await quizModel.findById(quizId).populate("questions"); 
   return quiz;
 };
 
